@@ -1,9 +1,11 @@
 import { css } from "./css";
 import { useLandingModel } from "./useLandingModel";
 import { CalEmbed } from "./CalEmbed";
+import { ThankYouPage } from "./ThankYouPage";
 
 export default function LandingPage({ accent = "#D6EC1B" }) {
   const model = useLandingModel(accent);
+  if (model.thankYou) return <ThankYouPage accent={model.accent} onBack={model.restart} />;
   return (
     <div style={css("font-family: 'DM Sans', 'Helvetica Neue', Helvetica, sans-serif; color: #191B1D; background: #FFFFFF; line-height: 1.55; font-size: 17px")}>
       <div style={css("background: #191B1D; color: #E4E6E8; padding: 10px 24px; font-size: 14px; border-bottom: 1px solid #2E3134")}>
@@ -212,7 +214,7 @@ export default function LandingPage({ accent = "#D6EC1B" }) {
                 <h2 style={css("margin: 0; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.2")}>
                   {"Pick a time"}
                 </h2>
-                <CalEmbed />
+                <CalEmbed onScheduled={model.markBooked} />
                 <button type="button" onClick={model.backToQuestions} style={css("align-self: flex-start; font: inherit; background: none; border: 0; color: #4A4F55; padding: 8px 0; min-height: 44px; cursor: pointer; text-decoration: underline")}>
                   {"Back to questions"}
                 </button>
