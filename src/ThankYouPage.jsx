@@ -1,6 +1,18 @@
+import { useEffect } from "react";
 import { css } from "./css";
 
 export function ThankYouPage({ accent = "#D6EC1B", onBack }) {
+  useEffect(() => {
+    const previous = document.title;
+    document.title = "You’re booked | Vinay Hankare";
+    if (typeof window.fbq === "function") {
+      window.fbq("track", "Schedule");
+      window.fbq("track", "Lead");
+    }
+    return () => {
+      document.title = previous;
+    };
+  }, []);
   return (
     <div style={css("min-height: 100vh; font-family: 'DM Sans', 'Helvetica Neue', Helvetica, sans-serif; color: #FFFFFF; background: #191B1D; line-height: 1.55; font-size: 17px")}>
       <div style={css("padding: 10px 24px; font-size: 14px; border-bottom: 1px solid #2E3134")}>

@@ -1,7 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+function isThankYouPath() {
+  return window.location.pathname.replace(/\/+$/, "") === "/thank-you";
+}
 
 export function useLandingModel(accent = "#D6EC1B") {
-  const [state, setStateRaw] = useState({});
+  const [state, setStateRaw] = useState(() => (isThankYouPath() ? { step: 8 } : {}));
+  useEffect(() => {
+    const onPop = () => setStateRaw((prev) => ({ ...prev, step: isThankYouPath() ? 8 : 1 }));
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
   const setState = (patch) => {
     setStateRaw((prev) => ({ ...prev, ...(typeof patch === "function" ? patch(prev) : patch) }));
   };
@@ -91,8 +100,16 @@ function compute(self) {
       back: () => self.setState({ step: Math.max(1, step - 1) }),
       q0: false, inQuiz: step >= 1 && step <= 6, booking: step === 7, thankYou: step === 8,
       backToQuestions: () => self.setState({ step: 6 }),
-      markBooked: () => { self.setState({ step: 8 }); window.scrollTo(0, 0); },
-      restart: () => self.setState({ step: 1 }),
+      markBooked: () => {
+        if (!isThankYouPath()) window.history.pushState({}, "", "/thank-you");
+        self.setState({ step: 8 });
+        window.scrollTo(0, 0);
+      },
+      restart: () => {
+        if (window.location.pathname !== "/") window.history.pushState({}, "", "/");
+        self.setState({ step: 1 });
+        window.scrollTo(0, 0);
+      },
       q1: step === 1, q2: step === 2, q3: step === 3, q4: step === 4, q5: step === 5, q6: step === 6,
       qNum: Math.min(step, 6), qPct: pct + "%",
       barStyle: "height: 100%; width: " + pct + "%; background: #191B1D; border-radius: 999px; transition: width .3s",
